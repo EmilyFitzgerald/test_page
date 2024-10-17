@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Sample Page</title>
+    <title>Trove API Example</title>
 </head>
 <body>
 
@@ -22,7 +22,13 @@
                 <li>A footer</li>
             </ul>
         </section>
-        
+
+        <section id="trove-results">
+            <h2>Trove Search Results</h2>
+            <p>Search results from Trove will be displayed here:</p>
+            <div id="results"></div>
+        </section>
+
         <section>
             <h2>Contact</h2>
             <p>You can contact us at <a href="mailto:info@example.com">info@example.com</a>.</p>
@@ -32,6 +38,41 @@
     <footer>
         <p>&copy; 2024 My Basic Page. All rights reserved.</p>
     </footer>
+
+    <script>
+        // Your Trove API key (replace 'YOUR_API_KEY' with your actual key)
+        const apiKey = API_KEY;
+        const query = 'Australian history';  // Example search query
+
+        // Function to fetch Trove search results
+        async function fetchTroveData() {
+            try {
+                const response = await fetch(`https://api.trove.nla.gov.au/v2/result?key=${apiKey}&q=${query}&zone=newspaper&encoding=json`);
+                const data = await response.json();
+
+                // Get the div where the results will be displayed
+                const resultsDiv = document.getElementById('results');
+
+                // If there are articles, display them
+                if (data.response.zone[0].records.article) {
+                    data.response.zone[0].records.article.forEach(article => {
+                        const articleItem = document.createElement('p');
+                        articleItem.textContent = `${article.heading} - Published: ${article.date}`;
+                        resultsDiv.appendChild(articleItem);
+                    });
+                } else {
+                    resultsDiv.textContent = 'No results found.';
+                }
+
+            } catch (error) {
+                console.error('Error fetching data from Trove:', error);
+                document.getElementById('results').textContent = 'Error fetching results.';
+            }
+        }
+
+        // Call the function to fetch Trove data when the page loads
+        fetchTroveData();
+    </script>
 
 </body>
 </html>
